@@ -1,0 +1,22 @@
+{
+  "name": "web-audio-progress-bar",
+  "version": "1.0.0",
+  "description": "Progress bar for Web Audio API",
+  "main": "host.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jurelik/web-audio-progress-bar.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jurelik/web-audio-progress-bar/issues"
+  },
+  "homepage": "https://github.com/jurelik/web-audio-progress-bar#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
