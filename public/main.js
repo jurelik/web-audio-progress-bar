@@ -51,7 +51,6 @@ function playRev() {
   let startTime = context.currentTime;
 
   source.buffer = bufferReverse;
-  source.playbackRate = 1.0;
   source.connect(context.destination);
   source.start(context.currentTime);
   
@@ -59,8 +58,17 @@ function playRev() {
 }
 
 function stop() {
-  source.stop();
-}
+  let slowDown = setTimeout(() => {
+    source.playbackRate.value -= 0.01;
+    console.log(source.playbackRate);
+    stop();
+  }, 1);
+
+  if (source.playbackRate.value < 0) {
+    source.stop()
+    clearTimeout(slowDown);
+  }
+};
 
 function updateProgress(startTime) {
   let length = buffer.duration;
