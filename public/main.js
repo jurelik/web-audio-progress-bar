@@ -26,17 +26,23 @@ function play() {
   source.connect(context.destination);
   source.start();
 
-  updateProgress(startTime);
+  updateProgress(startTime, source);
 }
 
-function updateProgress(startTime) {
+function updateProgress(startTime, source) {
   let length = buffer.duration;
 
-  setTimeout(() => {
+  let update = setTimeout(() => {
     let progress = (context.currentTime - startTime) / length * 100;
     progressBar.value = progress;
 
     console.log(progressBar.value);
-    updateProgress(startTime);
-  }, 500);
+
+    if (progress < 100) {
+      updateProgress(startTime, source);
+    }
+    else {
+      clearTimeout(update);
+    }
+  }, 100);
 }
