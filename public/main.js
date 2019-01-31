@@ -2,6 +2,8 @@ const AudioContext = window.AudioContext || window.webkitAudioContext;
 const context = new AudioContext();
 
 let buffer;
+let bufferReverse;
+let source;
 const progressBar = document.getElementById('progress-bar');
 
 fetch('warble.mp3').then(res => {
@@ -10,7 +12,21 @@ fetch('warble.mp3').then(res => {
   context.decodeAudioData(res).then(decoded => {
     buffer = decoded;
     console.log('decoded');
-    console.log(buffer);
+  }).catch(error => {
+    console.log(error);
+  });
+}).catch(error => {
+  console.log(error);
+});
+
+fetch('warble.mp3').then(res => {
+  return res.arrayBuffer();
+}).then(res => {
+  context.decodeAudioData(res).then(decoded => {
+    bufferReverse = decoded;
+    bufferReverse.getChannelData(0).reverse();
+    bufferReverse.getChannelData(1).reverse();
+    console.log('decoded');
   }).catch(error => {
     console.log(error);
   });
@@ -19,18 +35,39 @@ fetch('warble.mp3').then(res => {
 });
 
 function play() {
-  let source = context.createBufferSource();
+  source = context.createBufferSource();
   let startTime = context.currentTime;
 
   source.buffer = buffer;
+  source.playbackRate = 1.0;
   source.connect(context.destination);
-  source.start();
-
-  updateProgress(startTime, source);
+  source.start(context.currentTime);
+  
+  updateProgress(startTime);
 }
 
-function updateProgress(startTime, source) {
+function playRev() {
+  let source = context.createBufferSource();
+  let startTime = context.currentTime;
+
+  source.buffer = bufferReverse;
+  source.playbackRate = 1.0;
+  source.connect(context.destination);
+  source.start(context.currentTime);
+  
+  updateProgress(startTime);
+}
+
+function stop() {
+  source.stop();
+}
+
+function updateProgress(startTime) {
   let length = buffer.duration;
+
+  source.onended = () => {
+    clearTimeout(update);
+  };
 
   let update = setTimeout(() => {
     let progress = (context.currentTime - startTime) / length * 100;
@@ -38,11 +75,6 @@ function updateProgress(startTime, source) {
 
     console.log(progressBar.value);
 
-    if (progress < 100) {
-      updateProgress(startTime, source);
-    }
-    else {
-      clearTimeout(update);
-    }
+    updateProgress(startTime);
   }, 100);
 }
