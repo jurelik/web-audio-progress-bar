@@ -4,6 +4,7 @@ const context = new AudioContext();
 let buffer;
 let bufferReverse;
 let source;
+let currentOffset = 0;
 const progressBar = document.getElementById('progress-bar');
 
 fetch('warble.mp3').then(res => {
@@ -41,7 +42,7 @@ function play() {
   source.buffer = buffer;
   source.playbackRate = 1.0;
   source.connect(context.destination);
-  source.start(context.currentTime);
+  source.start(context.currentTime, currentOffset);
   
   updateProgress(startTime);
 }
@@ -75,10 +76,11 @@ function updateProgress(startTime) {
 
   source.onended = () => {
     clearTimeout(update);
+    currentOffset += context.currentTime - startTime;
   };
 
   let update = setTimeout(() => {
-    let progress = (context.currentTime - startTime) / length * 100;
+    let progress = (context.currentTime - startTime + currentOffset) / length * 100;
     progressBar.value = progress;
 
     console.log(progressBar.value);
